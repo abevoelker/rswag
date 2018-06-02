@@ -149,8 +149,10 @@ module Rswag
       end
 
       def build_json_payload(parameters, example)
-        body_param = parameters.select { |p| p[:in] == :body }.first
-        body_param ? example.send(body_param[:name]).to_json : nil
+        json_params = parameters
+          .select { |p| p[:in] == :body }
+          .each_with_object({}) {|p,acc| acc[p[:name]] = example.send(p[:name]).as_json }
+        json_params.any? ? json_params.to_json : nil
       end
     end
   end
